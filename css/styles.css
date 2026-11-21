@@ -269,3 +269,7 @@ pre.msg { margin: 10px 0 0; white-space: pre-wrap; font-family: ui-monospace, Me
   html { scroll-behavior: auto; }
   .hero-bg { transform: none; }
 }
+
+/* przełącznik języka */
+.lang-btn { min-width: 48px; height: 40px; padding: 0 12px; border: 1px solid rgba(255, 255, 255, 0.5); border-radius: 999px; background: transparent; color: #FFFFFF; font-weight: 700; font-size: 14px; letter-spacing: 0.06em; transition: background-color 250ms var(--ease), border-color 250ms var(--ease); }
+.lang-btn:hover { background: rgba(255, 255, 255, 0.14); border-color: #FFFFFF; }

@@ -17,10 +17,16 @@ Prezentacja nowej strony restauracji MR BAO by Maamz (Wolska 50A, Warszawa Wola)
 - nagłówek zmniejsza się przy przewijaniu, efekt paralaksy w hero, menu mobilne
 - kopiowanie telefonu i e-maila
 
+## Wersje językowe
+- Przełącznik PL / EN w nagłówku, wybór zapamiętywany w przeglądarce.
+- Link prosto do wersji angielskiej: dopisz `?lang=en`, np. `index.html?lang=en`.
+- Teksty: `js/i18n.js` (stałe teksty stron, opisy dań i kategorie po angielsku).
+
 ## Struktura
 ```
 index.html, menu.html, o-nas.html, kontakt.html
 css/styles.css
+js/i18n.js   – tłumaczenia PL / EN
 js/data.js   – menu, ceny, godziny, numer WhatsApp
 js/main.js   – cała logika
 images/      – zdjęcia dań (WebP)

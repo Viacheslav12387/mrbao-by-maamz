@@ -2,7 +2,11 @@
 (function () {
   'use strict';
 
-  const DAYS = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+  const DAYS = t('days');
+  const EN = window.LANG === 'en';
+  const nameOf = (i) => (EN && MENU_EN.names[i.id]) || i.name;
+  const descOf = (i) => (EN && MENU_EN.desc[i.id]) || i.desc || '';
+  const sauceLabel = (s) => (EN && MENU_EN.sauces[s]) || s;
   const ITEMS = {};
   MRBAO.menu.forEach((c) => c.items.forEach((i) => { ITEMS[i.id] = i; }));
 
@@ -33,7 +37,7 @@
       if (!h) continue;
       let start = h[0] * 60 + 30;
       if (d === 0) start = Math.max(start, Math.ceil((now.mins + 30) / 15) * 15);
-      const label = d === 0 ? 'dziś' : d === 1 ? 'jutro' : DAYS[day].toLowerCase();
+      const label = d === 0 ? t('today') : d === 1 ? t('tomorrow') : DAYS[day].toLowerCase();
       for (let m = start; m <= MRBAO.lastOrder; m += 15) out.push(`${label} ${hhmm(m)}`);
     }
     return out;
@@ -69,13 +73,13 @@
     $$('[data-status]').forEach((el) => {
       const h = MRBAO.hours[day];
       el.classList.toggle('is-open', isOpen());
-      el.querySelector('.txt').textContent = isOpen() ? `Otwarte do ${h[1]}:00` : 'Teraz zamknięte, zamówisz na później';
+      el.querySelector('.txt').textContent = isOpen() ? `${t('openUntil')} ${h[1]}:00` : t('closedNow');
     });
     const hours = $('#hours');
     if (hours) {
       hours.innerHTML = [1, 2, 3, 4, 5, 6, 0].map((d) => {
         const h = MRBAO.hours[d];
-        return `<div class="${d === day ? 'today' : ''}"><span>${DAYS[d]}</span><span class="price">${h ? `${h[0]}:00–${h[1]}:00` : 'zamknięte'}</span></div>`;
+        return `<div class="${d === day ? 'today' : ''}"><span>${DAYS[d]}</span><span class="price">${h ? `${h[0]}:00–${h[1]}:00` : t('closed')}</span></div>`;
       }).join('');
     }
   }
@@ -85,19 +89,19 @@
   /* ---------- karty dań ---------- */
   function cardHtml(item) {
     const sauce = item.sauce
-      ? `<label class="sauce">Sos<select data-sauce="${item.id}">${MRBAO.sauces.map((s) => `<option>${s}</option>`).join('')}</select></label>`
+      ? `<label class="sauce">${t('sauce')}<select data-sauce="${item.id}">${MRBAO.sauces.map((s) => `<option value="${s}">${sauceLabel(s)}</option>`).join('')}</select></label>`
       : '';
     const photo = item.img
-      ? `<button type="button" class="card-photo" data-zoom="${item.id}" aria-label="Powiększ zdjęcie: ${esc(item.name)}"><img src="${imgSrc(item.img)}" width="900" height="900" alt="${esc(item.name)}" loading="lazy"></button>`
-      : `<div class="card-photo no-photo"><img src="images/logo.webp" width="170" height="170" alt="" loading="lazy"><span>Zdjęcie wkrótce</span></div>`;
-    return `<article class="card" data-name="${esc(item.name.toLowerCase())} ${esc((item.desc || '').toLowerCase())}">
+      ? `<button type="button" class="card-photo" data-zoom="${item.id}" aria-label="${t('zoom')}: ${esc(nameOf(item))}"><img src="${imgSrc(item.img)}" width="900" height="900" alt="${esc(nameOf(item))}" loading="lazy"></button>`
+      : `<div class="card-photo no-photo"><img src="images/logo.webp" width="170" height="170" alt="" loading="lazy"><span>${t('noPhoto')}</span></div>`;
+    return `<article class="card" data-name="${esc(nameOf(item).toLowerCase())} ${esc(descOf(item).toLowerCase())} ${esc(item.name.toLowerCase())}">
       ${photo}
       <div class="card-body">
-        <h3>${esc(item.name)}</h3>
-        <p class="desc">${esc(item.desc || '')}</p>
+        <h3>${esc(nameOf(item))}</h3>
+        <p class="desc">${esc(descOf(item))}</p>
         ${sauce}
         <div class="card-foot"><span class="price">${zl(item.price)}</span>
-          <button type="button" class="add-btn" data-add="${item.id}" aria-label="Dodaj ${esc(item.name)} do koszyka">Dodaj</button></div>
+          <button type="button" class="add-btn" data-add="${item.id}" aria-label="${t('add')} ${esc(nameOf(item))} ${t('addToCart')}">${t('add')}</button></div>
       </div></article>`;
   }
 
@@ -106,13 +110,13 @@
 
   const menuList = $('#menuList');
   if (menuList) {
-    $('#tabs').innerHTML = MRBAO.menu.map((c) => `<a href="#cat-${c.id}" data-tab="cat-${c.id}">${c.name}</a>`).join('');
+    $('#tabs').innerHTML = MRBAO.menu.map((c) => `<a href="#cat-${c.id}" data-tab="cat-${c.id}">${EN ? MENU_EN.categories[c.id][0] : c.name}</a>`).join('');
     menuList.innerHTML = MRBAO.menu.map((c) => {
       const inner = c.type === 'cards'
         ? `<div class="cards">${c.items.map(cardHtml).join('')}</div>`
-        : `<ul class="list">${c.items.map((i) => `<li data-name="${esc(i.name.toLowerCase())}"><span class="name">${esc(i.name)}</span><span class="r"><span class="price">${zl(i.price)}</span><button type="button" class="add-btn" data-add="${i.id}" aria-label="Dodaj ${esc(i.name)} do koszyka">Dodaj</button></span></li>`).join('')}</ul>`;
-      return `<section class="cat" id="cat-${c.id}"><div class="cat-head"><h2>${c.name}</h2>${c.note ? `<span>${c.note}</span>` : ''}</div>${inner}</section>`;
-    }).join('') + '<p class="no-results" id="noResults" hidden>Nie znaleźliśmy takiego dania. Spróbuj innej nazwy.</p>';
+        : `<ul class="list">${c.items.map((i) => `<li data-name="${esc(nameOf(i).toLowerCase())} ${esc(i.name.toLowerCase())}"><span class="name">${esc(nameOf(i))}</span><span class="r"><span class="price">${zl(i.price)}</span><button type="button" class="add-btn" data-add="${i.id}" aria-label="${t('add')} ${esc(nameOf(i))} ${t('addToCart')}">${t('add')}</button></span></li>`).join('')}</ul>`;
+      return `<section class="cat" id="cat-${c.id}"><div class="cat-head"><h2>${EN ? MENU_EN.categories[c.id][0] : c.name}</h2>${(EN ? MENU_EN.categories[c.id][1] : c.note) ? `<span>${EN ? MENU_EN.categories[c.id][1] : c.note}</span>` : ''}</div>${inner}</section>`;
+    }).join('') + `<p class="no-results" id="noResults" hidden>${t('noResults')}</p>`;
 
     // aktywna zakładka przy przewijaniu
     const tabs = $$('[data-tab]');
@@ -164,13 +168,13 @@
   lightbox.hidden = true;
   lightbox.setAttribute('role', 'dialog');
   lightbox.setAttribute('aria-modal', 'true');
-  lightbox.innerHTML = '<button type="button" class="x" aria-label="Zamknij zdjęcie">×</button><figure><img src="" alt=""><figcaption></figcaption></figure>';
+  lightbox.innerHTML = `<button type="button" class="x" aria-label="${t('closePhoto')}">×</button><figure><img src="" alt=""><figcaption></figcaption></figure>`;
   document.body.appendChild(lightbox);
   function openLightbox(id) {
     const item = ITEMS[id];
     $('img', lightbox).src = imgSrc(item.img);
-    $('img', lightbox).alt = item.name;
-    $('figcaption', lightbox).textContent = `${item.name} · ${zl(item.price)}`;
+    $('img', lightbox).alt = nameOf(item);
+    $('figcaption', lightbox).textContent = `${nameOf(item)} · ${zl(item.price)}`;
     lightbox.hidden = false;
     $('.x', lightbox).focus();
   }
@@ -187,47 +191,47 @@
   document.body.insertAdjacentHTML('beforeend', `
     <button type="button" class="fab" id="fab" data-open-cart hidden><span id="fabCount"></span><span class="price" id="fabSum"></span></button>
     <div class="backdrop" id="backdrop"></div>
-    <aside class="drawer" id="drawer" aria-label="Koszyk" aria-hidden="true">
-      <div class="drawer-head"><h2>Twoje zamówienie</h2><button type="button" class="x" id="closeCart" aria-label="Zamknij koszyk">×</button></div>
+    <aside class="drawer" id="drawer" aria-label="${t('cart')}" aria-hidden="true">
+      <div class="drawer-head"><h2>${t('yourOrder')}</h2><button type="button" class="x" id="closeCart" aria-label="${t('closeCart')}">×</button></div>
       <div class="drawer-body" id="cartBody"></div>
       <div class="drawer-foot" id="cartFoot"></div>
     </aside>`);
 
   const totals = () => state.lines.reduce((t, l) => ({ sum: t.sum + ITEMS[l.id].price * l.qty, count: t.count + l.qty }), { sum: 0, count: 0 });
   function message() {
-    const t = totals();
-    const rows = state.lines.map((l) => `${l.qty}× ${ITEMS[l.id].name}${l.sauce ? ` (sos: ${l.sauce})` : ''} – ${zl(ITEMS[l.id].price * l.qty)}`);
+    const tot = totals();
+    const rows = state.lines.map((l) => `${l.qty}× ${nameOf(ITEMS[l.id])}${l.sauce ? ` (${t('msgSauce')}: ${sauceLabel(l.sauce)})` : ''} – ${zl(ITEMS[l.id].price * l.qty)}`);
     return [
-      'Dzień dobry! Zamówienie ze strony MR BAO:', '', ...rows, '',
-      `Razem: ${zl(t.sum)}`,
-      `Odbiór: Wolska 50A / lokal 14, ${state.time || '[godzina]'}`,
-      `Imię: ${state.name.trim() || '[imię]'}`,
-      `Płatność: ${state.pay === 'blik' ? 'BLIK z góry' : 'przy odbiorze'}`,
-      ...(state.notes.trim() ? [`Uwagi: ${state.notes.trim()}`] : []),
+      t('msgHello'), '', ...rows, '',
+      `${t('msgTotal')}: ${zl(tot.sum)}`,
+      `${t('msgPickup')}, ${state.time || t('time')}`,
+      `${t('msgName')}: ${state.name.trim() || t('nameMissing')}`,
+      `${t('msgPay')}: ${state.pay === 'blik' ? t('msgBlik') : t('msgAtPickup')}`,
+      ...(state.notes.trim() ? [`${t('msgNotes')}: ${state.notes.trim()}`] : []),
     ].join('\n');
   }
   const waHref = () => `https://wa.me/${MRBAO.whatsapp}?text=${encodeURIComponent(message())}`;
 
   function renderBadges(bump) {
-    const t = totals();
+    const tot = totals();
     $$('.cart-badge').forEach((b) => {
-      b.textContent = t.count;
+      b.textContent = tot.count;
       if (bump) { b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump'); }
     });
     const fab = $('#fab');
-    fab.hidden = t.count === 0;
-    $('#fabCount').textContent = `Koszyk · ${t.count} szt.`;
-    $('#fabSum').textContent = zl(t.sum);
+    fab.hidden = tot.count === 0;
+    $('#fabCount').textContent = `${t('cart')} · ${tot.count} ${t('pcs')}`;
+    $('#fabSum').textContent = zl(tot.sum);
   }
 
   function renderCart() {
     renderBadges(false);
-    const t = totals();
+    const tot = totals();
     const body = $('#cartBody');
     const foot = $('#cartFoot');
-    if (!t.count) {
-      body.innerHTML = '<p class="empty">Koszyk jest pusty. Dodaj dania z menu przyciskiem „Dodaj”.</p>';
-      foot.innerHTML = '<a class="btn btn-accent" href="menu.html">Przejdź do menu</a>';
+    if (!tot.count) {
+      body.innerHTML = `<p class="empty">${t('empty')}</p>`;
+      foot.innerHTML = `<a class="btn btn-accent" href="menu.html${EN ? '?lang=en' : ''}">${t('toMenu')}</a>`;
       return;
     }
     const slots = pickupSlots();
@@ -237,21 +241,21 @@
       <ul class="lines">${state.lines.map((l, ix) => {
         const i = ITEMS[l.id];
         return `<li>${i.img ? `<img class="thumb" src="${imgSrc(i.img)}" alt="">` : '<span class="thumb blank"></span>'}
-          <span class="nm">${esc(i.name)}${l.sauce ? `<small>sos: ${esc(l.sauce)}</small>` : ''}</span>
+          <span class="nm">${esc(nameOf(i))}${l.sauce ? `<small>${t('msgSauce')}: ${esc(sauceLabel(l.sauce))}</small>` : ''}</span>
           <span class="price">${zl(i.price * l.qty)}</span>
-          <span class="stepper"><button type="button" data-dec="${ix}" aria-label="Usuń jedną sztukę">−</button><span>${l.qty}</span><button type="button" data-inc="${ix}" aria-label="Dodaj jedną sztukę">+</button></span></li>`;
+          <span class="stepper"><button type="button" data-dec="${ix}" aria-label="${t('removeOne')}">−</button><span>${l.qty}</span><button type="button" data-inc="${ix}" aria-label="${t('addOne')}">+</button></span></li>`;
       }).join('')}</ul>
-      <div class="totals"><div><span>Liczba pozycji</span><span class="price">${t.count}</span></div><div class="sum"><span>Do zapłaty</span><span class="price">${zl(t.sum)}</span></div></div>
-      <p class="note">Odbiór osobisty: Wolska 50A / lokal 14. Zamówienia na wynos pon–sob 12:00–21:30.</p>
-      <div class="field"><label for="f-name">Imię</label><input id="f-name" autocomplete="given-name" placeholder="np. Kasia" value="${esc(state.name)}">${nameErr ? '<span class="err">Wpisz imię, żeby lokal wiedział, dla kogo jest zamówienie.</span>' : ''}</div>
-      <div class="field"><label for="f-time">Godzina odbioru</label><select id="f-time">${slots.map((s) => `<option${s === state.time ? ' selected' : ''}>${s}</option>`).join('')}</select></div>
-      <fieldset class="pay"><legend class="legend">Płatność</legend>
-        <label><input type="radio" name="pay" value="blik"${state.pay === 'blik' ? ' checked' : ''}>BLIK z góry<small>numer podamy w odpowiedzi</small></label>
-        <label><input type="radio" name="pay" value="odbior"${state.pay === 'odbior' ? ' checked' : ''}>Przy odbiorze<small>gotówka lub karta</small></label></fieldset>
-      <div class="field"><label for="f-notes">Uwagi (opcjonalnie)</label><textarea id="f-notes" placeholder="np. bez kolendry">${esc(state.notes)}</textarea></div>
-      <details class="preview"><summary>Podgląd wiadomości do lokalu</summary><pre class="msg" id="msg">${esc(message())}</pre></details>`;
-    foot.innerHTML = `<a class="btn btn-green send" id="send" target="_blank" rel="noopener" href="${waHref()}"${state.name.trim() ? '' : ' aria-disabled="true"'}>Wyślij zamówienie przez WhatsApp</a>
-      <p class="note" style="text-align:center">Zamówienie trafi do lokalu po kliknięciu „Wyślij” w WhatsAppie. Lokal potwierdzi kwotę i czas odbioru.</p>`;
+      <div class="totals"><div><span>${t('items')}</span><span class="price">${tot.count}</span></div><div class="sum"><span>${t('total')}</span><span class="price">${zl(tot.sum)}</span></div></div>
+      <p class="note">${t('pickupInfo')}</p>
+      <div class="field"><label for="f-name">${t('name')}</label><input id="f-name" autocomplete="given-name" placeholder="${t('namePh')}" value="${esc(state.name)}">${nameErr ? `<span class="err">${t('nameErr')}</span>` : ''}</div>
+      <div class="field"><label for="f-time">${t('pickupTime')}</label><select id="f-time">${slots.map((s) => `<option${s === state.time ? ' selected' : ''}>${s}</option>`).join('')}</select></div>
+      <fieldset class="pay"><legend class="legend">${t('payment')}</legend>
+        <label><input type="radio" name="pay" value="blik"${state.pay === 'blik' ? ' checked' : ''}>${t('blik')}<small>${t('blikNote')}</small></label>
+        <label><input type="radio" name="pay" value="odbior"${state.pay === 'odbior' ? ' checked' : ''}>${t('atPickup')}<small>${t('atPickupNote')}</small></label></fieldset>
+      <div class="field"><label for="f-notes">${t('notes')}</label><textarea id="f-notes" placeholder="${t('notesPh')}">${esc(state.notes)}</textarea></div>
+      <details class="preview"><summary>${t('preview')}</summary><pre class="msg" id="msg">${esc(message())}</pre></details>`;
+    foot.innerHTML = `<a class="btn btn-green send" id="send" target="_blank" rel="noopener" href="${waHref()}"${state.name.trim() ? '' : ' aria-disabled="true"'}>${t('send')}</a>
+      <p class="note" style="text-align:center">${t('sendNote')}</p>`;
   }
   function refreshMessage() {
     const m = $('#msg');
@@ -282,19 +286,19 @@
     persist();
     renderBadges(true);
     btn.classList.add('is-added');
-    btn.textContent = 'Dodano ✓';
-    setTimeout(() => { btn.classList.remove('is-added'); btn.textContent = 'Dodaj'; }, 1400);
-    showToast(`${ITEMS[id].name} w koszyku · razem ${zl(totals().sum)}`);
+    btn.textContent = t('added');
+    setTimeout(() => { btn.classList.remove('is-added'); btn.textContent = t('add'); }, 1400);
+    showToast(`${nameOf(ITEMS[id])} ${t('inCart')} ${zl(totals().sum)}`);
   }
 
   /* ---------- kopiowanie numeru i e-maila ---------- */
   function copyText(btn) {
     const text = btn.dataset.copy;
-    const done = () => { const old = btn.textContent; btn.textContent = 'Skopiowano'; setTimeout(() => { btn.textContent = old; }, 1500); };
+    const done = () => { const old = btn.textContent; btn.textContent = t('copied'); setTimeout(() => { btn.textContent = old; }, 1500); };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done).catch(() => showToast('Zaznacz tekst i skopiuj ręcznie'));
+      navigator.clipboard.writeText(text).then(done).catch(() => showToast(t('copyManual')));
     } else {
-      showToast('Zaznacz tekst i skopiuj ręcznie');
+      showToast(t('copyManual'));
     }
   }
 
