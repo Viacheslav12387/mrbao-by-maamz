@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kontakt – MR BAO by Maamz</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="description" content="MR BAO by Maamz, Wolska 50A / lokal 14, Warszawa. Telefon +48 608 792 130, godziny otwarcia i dojazd.">
+  <link rel="icon" href="images/logo.webp" type="image/webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="topbar">✨ Świeże Bao i azjatycki street food w Warszawie</div>
+  <header class="header" id="header">
+    <div class="container">
+      <a class="logo" href="index.html" aria-label="MR BAO by Maamz, strona główna"><img src="images/logo.webp" width="170" height="170" alt="Logo MR BAO by Maamz"></a>
+      <nav class="nav" id="nav" aria-label="Główna nawigacja">
+        <a href="index.html">Strona główna</a>
+        <a href="menu.html">Menu</a>
+        <a href="o-nas.html">O nas</a>
+        <a href="kontakt.html" aria-current="page">Kontakt</a>
+      </nav>
+      <div class="header-actions">
+        <button type="button" class="cart-btn" data-open-cart aria-label="Otwórz koszyk">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6h15l-1.5 9h-12z"/><path d="M6 6 5 3H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>
+          <span class="cart-badge">0</span>
+        </button>
+        <button type="button" class="burger" aria-label="Pokaż menu nawigacji" aria-expanded="false" aria-controls="nav">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="contact">
+    <section class="section">
+      <div class="container">
+        <p class="eyebrow">Kontakt</p>
+        <h1 class="display">Restauracja na Woli: zapraszamy na MR BAO</h1>
+        <p style="margin-top:14px;max-width:60ch;color:var(--muted);font-size:18px">Wpadnij na świeże bao, poke bowle i chrupiącego kurczaka albo zamów na wynos przez stronę.</p>
+        <p class="status-pill" data-status style="margin-top:18px;background:var(--ink);color:#FFFFFF"><span class="dot"></span><span class="txt">Sprawdzam godziny…</span></p>
+        <div class="contact-grid">
+          <div class="contact-box">
+            <h2>Adres</h2>
+            <address>MR BAO by Maamz<br>Wolska 50A / lokal 14<br>01-187 Warszawa</address>
+            <a class="btn btn-line" href="https://maps.app.goo.gl/StzndoFGsQeHQMcY7" target="_blank" rel="noopener"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg> Pokaż na mapie</a>
+          </div>
+          <div class="contact-box">
+            <h2>Telefon i e-mail</h2>
+            <div class="copy-row"><span>+48 608 792 130</span><button type="button" class="copy-btn" data-copy="+48608792130">Kopiuj</button></div>
+            <div class="copy-row"><span>mrbaobymaamz@gmail.com</span><button type="button" class="copy-btn" data-copy="mrbaobymaamz@gmail.com">Kopiuj</button></div>
+            <a class="btn btn-green" href="https://wa.me/48608792130" target="_blank" rel="noopener">Napisz na WhatsApp</a>
+          </div>
+          <div class="contact-box">
+            <h2>Godziny otwarcia</h2>
+            <div class="hours" id="hours"></div>
+            <p class="note">Zamówienia na wynos przyjmujemy do 21:30.</p>
+          </div>
+        </div>
+        <figure class="lokal-photo"><img src="images/lokal.webp" width="720" height="720" alt="Lada MR BAO z logo lokalu i menu na ścianie" loading="lazy"><figcaption>Lokal 14, Wolska 50A: tu odbierzesz zamówienie.</figcaption></figure>
+        <p style="margin-top:32px"><a class="btn btn-accent" href="menu.html">Zamów online</a></p>
+      </div>
+    </section>
+  </main>
+  <footer class="footer">
+    <div class="container">
+      <span>© MR BAO by Maamz · Wolska 50A / lokal 14, 01-187 Warszawa</span>
+      <span><a href="menu.html">Menu</a> · <a href="o-nas.html">O nas</a> · <a href="kontakt.html">Kontakt</a></span>
+    </div>
+  </footer>
+  <button type="button" class="to-top" aria-label="Wróć na górę strony">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg>
+  </button>
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
